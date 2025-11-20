@@ -7,8 +7,6 @@ ARG VERSION
 WORKDIR /work
 COPY . .
 
-RUN GOPATH=/artifacts go install -ldflags="-w -X 'main.Version=${VERSION}'" ./tools/...
-
 RUN mkdir -p /dist
 RUN make PREFIX=/dist cmds
 
@@ -18,10 +16,11 @@ ARG VERSION
 
 LABEL maintainers="Compute"
 
-COPY --from=builder /artifacts/bin/nvidia-toolkit /usr/bin/nvidia-toolkit
 COPY --from=builder /dist/* /usr/bin/
 
 USER root
+
+RUN ln -s /usr/bin/nvidia-ctk-installer /usr/local/bin/nvidia-toolkit
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
@@ -33,6 +32,9 @@ RUN curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | \
     sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
     tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
 
+# Direct install with apt in the image
+ENV TOOLKIT_SOURCE_ROOT=/
+
 RUN ORIGINAL_VERSION=${VERSION%%-*} && apt-get update && apt-get install -y nvidia-container-toolkit=${ORIGINAL_VERSION#v}-1
 
-CMD [ "/usr/bin/nvidia-toolkit" ]
+CMD [ "/usr/local/bin/nvidia-toolkit" ]
