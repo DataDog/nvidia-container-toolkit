@@ -7,8 +7,6 @@ ARG VERSION
 WORKDIR /work
 COPY . .
 
-RUN GOPATH=/artifacts go install -ldflags="-w -X 'main.Version=${VERSION}'" ./tools/...
-
 RUN mkdir -p /dist
 RUN make PREFIX=/dist cmds
 
@@ -18,10 +16,11 @@ ARG VERSION
 
 LABEL maintainers="Compute"
 
-COPY --from=builder /artifacts/bin/nvidia-toolkit /usr/bin/nvidia-toolkit
 COPY --from=builder /dist/* /usr/bin/
 
 USER root
+
+RUN ln -s /usr/bin/nvidia-ctk-installer /usr/local/bin/nvidia-toolkit
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
