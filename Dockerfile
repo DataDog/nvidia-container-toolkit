@@ -32,6 +32,9 @@ RUN curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | \
     sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
     tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
 
+### ENV args for the toolkit ###
+# Only run install and skip containerd configuration
+ENV NO_SETUP=true
 # Direct install with apt in the image
 ENV TOOLKIT_SOURCE_ROOT=/
 
