@@ -43,6 +43,7 @@ type options struct {
 	toolkitInstallDir string
 
 	noDaemon    bool
+	noSetup     bool
 	pidFile     string
 	sourceRoot  string
 	packageType string
@@ -145,6 +146,13 @@ func (a app) build() *cli.Command {
 					}
 					return nil
 				},
+			},
+			&cli.BoolFlag{
+				Name:        "no-setup",
+				Aliases:     []string{"i"},
+				Usage:       "terminate immediately after installing the toolkit. Note that no setup or cleanup of the runtime will be performed",
+				Destination: &options.noSetup,
+				Sources:     cli.EnvVars("NO_SETUP"),
 			},
 			&cli.StringFlag{
 				Name:        "nri-socket",
@@ -299,9 +307,11 @@ func (a *app) Run(ctx context.Context, c *cli.Command, o *options) error {
 		return fmt.Errorf("unable to install toolkit: %v", err)
 	}
 
-	err = runtimeConfigurer.Setup(c, &o.runtimeOptions)
-	if err != nil {
-		return fmt.Errorf("unable to setup runtime: %w", err)
+	if !o.noSetup {
+		err = runtimeConfigurer.Setup(c, &o.runtimeOptions)
+		if err != nil {
+			return fmt.Errorf("unable to setup runtime: %w", err)
+		}
 	}
 
 	if o.noDaemon {
