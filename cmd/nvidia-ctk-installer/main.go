@@ -39,6 +39,7 @@ type options struct {
 	toolkitInstallDir string
 
 	noDaemon    bool
+	noSetup     bool
 	runtime     string
 	pidFile     string
 	sourceRoot  string
@@ -103,6 +104,13 @@ func (a app) build() *cli.Command {
 				Usage:       "terminate immediately after setting up the runtime. Note that no cleanup will be performed",
 				Destination: &options.noDaemon,
 				Sources:     cli.EnvVars("NO_DAEMON"),
+			},
+			&cli.BoolFlag{
+				Name:        "no-setup",
+				Aliases:     []string{"i"},
+				Usage:       "terminate immediately after installing the toolkit. Note that no setup or cleanup of the runtime will be performed",
+				Destination: &options.noSetup,
+				Sources:     cli.EnvVars("NO_SETUP"),
 			},
 			&cli.StringFlag{
 				Name:        "runtime",
@@ -216,9 +224,11 @@ func (a *app) Run(c *cli.Command, o *options) error {
 		return fmt.Errorf("unable to install toolkit: %v", err)
 	}
 
-	err = runtime.Setup(c, &o.runtimeOptions, o.runtime)
-	if err != nil {
-		return fmt.Errorf("unable to setup runtime: %v", err)
+	if !o.noSetup {
+		err = runtime.Setup(c, &o.runtimeOptions, o.runtime)
+		if err != nil {
+			return fmt.Errorf("unable to setup runtime: %v", err)
+		}
 	}
 
 	if !o.noDaemon {
@@ -227,9 +237,11 @@ func (a *app) Run(c *cli.Command, o *options) error {
 			return fmt.Errorf("unable to wait for signal: %v", err)
 		}
 
-		err = runtime.Cleanup(c, &o.runtimeOptions, o.runtime)
-		if err != nil {
-			return fmt.Errorf("unable to cleanup runtime: %v", err)
+		if !o.noSetup {
+			err = runtime.Cleanup(c, &o.runtimeOptions, o.runtime)
+			if err != nil {
+				return fmt.Errorf("unable to cleanup runtime: %v", err)
+			}
 		}
 	}
 
