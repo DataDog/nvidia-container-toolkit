@@ -37,6 +37,9 @@ RUN curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | \
 ENV NO_SETUP=true
 # Direct install with apt in the image
 ENV TOOLKIT_SOURCE_ROOT=/
+# Specify the Nvidia Driver directory to set caps files in correct /dev
+ENV NVIDIA_DRIVER_ROOT=/driver-root
+ENV NVIDIA_DEV_ROOT=/driver-root
 
 RUN ORIGINAL_VERSION=${VERSION%%-*} && apt-get update && apt-get install -y nvidia-container-toolkit=${ORIGINAL_VERSION#v}-1
 
