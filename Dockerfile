@@ -43,4 +43,7 @@ ENV NVIDIA_DEV_ROOT=/driver-root
 
 RUN ORIGINAL_VERSION=${VERSION%%-*} && apt-get update && apt-get install -y nvidia-container-toolkit=${ORIGINAL_VERSION#v}-1
 
+# Replace the default runtime with the CDI runtime
+RUN rm /bin/nvidia-container-runtime && cp /bin/nvidia-container-runtime.cdi /bin/nvidia-container-runtime
+
 CMD [ "/usr/local/bin/nvidia-toolkit" ]
