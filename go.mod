@@ -1,6 +1,6 @@
 module github.com/NVIDIA/nvidia-container-toolkit
 
-go 1.23.0
+go 1.25.5
 
 require (
 	github.com/NVIDIA/go-nvlib v0.7.1
