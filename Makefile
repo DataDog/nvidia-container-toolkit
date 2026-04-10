@@ -65,7 +65,8 @@ else
 EXTLDFLAGS = -Wl,-undefined,dynamic_lookup
 endif
 $(CMD_TARGETS): cmd-%:
-	go build -ldflags "-s -w '-extldflags=$(EXTLDFLAGS)' -X $(CLI_VERSION_PACKAGE).gitCommit=$(GIT_COMMIT) -X $(CLI_VERSION_PACKAGE).version=$(CLI_VERSION)" $(COMMAND_BUILD_OPTIONS) $(MODULE)/cmd/$(*)
+	CGO_ENABLED=1 GOEXPERIMENT=boringcrypto go build -tags fips -ldflags "-w '-extldflags=$(EXTLDFLAGS)' -X $(CLI_VERSION_PACKAGE).gitCommit=$(GIT_COMMIT) -X $(CLI_VERSION_PACKAGE).version=$(CLI_VERSION)" $(COMMAND_BUILD_OPTIONS) $(MODULE)/cmd/$(*)
+	go tool nm $(PREFIX)/$(*) | grep -E 'sig.FIPSOnly'
 
 build:
 	go build ./...
