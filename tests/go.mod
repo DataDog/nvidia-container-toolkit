@@ -2,7 +2,7 @@ module github.com/NVIDIA/nvidia-container-toolkit/tests
 
 go 1.24.0
 
-toolchain go1.24.1
+toolchain go1.26.2
 
 require (
 	github.com/onsi/ginkgo/v2 v2.28.1
