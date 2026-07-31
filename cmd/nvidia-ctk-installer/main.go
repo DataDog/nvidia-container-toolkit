@@ -331,9 +331,11 @@ func (a *app) Run(ctx context.Context, c *cli.Command, o *options) error {
 		return fmt.Errorf("unable to wait for signal: %v", err)
 	}
 
-	err = runtimeConfigurer.Cleanup(c, &o.runtimeOptions)
-	if err != nil {
-		return fmt.Errorf("unable to cleanup runtime: %v", err)
+	if !o.noSetup {
+		err = runtimeConfigurer.Cleanup(c, &o.runtimeOptions)
+		if err != nil {
+			return fmt.Errorf("unable to cleanup runtime: %v", err)
+		}
 	}
 
 	return nil
