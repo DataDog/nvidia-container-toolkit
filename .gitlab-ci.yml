@@ -6,3 +6,10 @@ build-docker-image:
     EXTRA_ARGS: --build-arg=VERSION=${CI_COMMIT_TAG}
     IMAGE_NAME: nvidia/container-toolkit
   extends: .build-docker-image
+
+build-merged-nydus-image:
+  needs: ["build-docker-image"]
+  variables:
+    IMAGE_NAME: nvidia/container-toolkit
+    MERGE_PLATFORM: "true"
+  extends: .build-nydus-image
