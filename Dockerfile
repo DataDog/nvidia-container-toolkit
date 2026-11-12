@@ -41,7 +41,14 @@ ENV TOOLKIT_SOURCE_ROOT=/
 ENV NVIDIA_DRIVER_ROOT=/driver-root
 ENV NVIDIA_DEV_ROOT=/driver-root
 
-RUN ORIGINAL_VERSION=${VERSION%%-*} && apt-get update && apt-get install -y nvidia-container-toolkit=${ORIGINAL_VERSION#v}-1
+# Pin every package in the toolkit family: the CUDA base image's apt repo (with a higher
+# pin priority) may ship older versions of the dependencies, which breaks resolution.
+RUN ORIGINAL_VERSION=${VERSION%%-*} && PKG_VERSION=${ORIGINAL_VERSION#v}-1 \
+    && apt-get update && apt-get install -y \
+    nvidia-container-toolkit=${PKG_VERSION} \
+    nvidia-container-toolkit-base=${PKG_VERSION} \
+    libnvidia-container-tools=${PKG_VERSION} \
+    libnvidia-container1=${PKG_VERSION}
 
 # Replace the default runtime with the CDI runtime
 RUN rm /bin/nvidia-container-runtime && cp /bin/nvidia-container-runtime.cdi /bin/nvidia-container-runtime
