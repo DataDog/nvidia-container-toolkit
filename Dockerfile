@@ -18,7 +18,8 @@ LABEL maintainers="Compute"
 
 COPY --from=builder /dist/* /usr/bin/
 
-USER root
+# user root has UID 0
+USER 0
 
 RUN ln -s /usr/bin/nvidia-ctk-installer /usr/local/bin/nvidia-toolkit
 
